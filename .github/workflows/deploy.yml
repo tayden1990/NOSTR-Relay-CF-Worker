@@ -31,6 +31,9 @@ jobs:
       - name: Typecheck
         run: pnpm -r run typecheck
 
+      - name: Run tests
+        run: pnpm run test
+
       - name: Build (admin-ui optional)
         run: pnpm --filter nostr-relay-admin-ui run build
         continue-on-error: true

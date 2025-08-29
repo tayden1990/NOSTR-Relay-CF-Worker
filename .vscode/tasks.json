@@ -242,6 +242,68 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "run-core-tests",
+			"type": "shell",
+			"command": "pnpm --filter @nostr-relay/core run test",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "install-vitest-core",
+			"type": "shell",
+			"command": "pnpm -w install",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "install-workspace",
+			"type": "shell",
+			"command": "pnpm install",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "install-after-changes",
+			"type": "shell",
+			"command": "pnpm install",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "run-core-tests-now",
+			"type": "shell",
+			"command": "pnpm --filter @nostr-relay/core run test",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run-repo-tests",
+			"type": "shell",
+			"command": "pnpm run test",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "rerun-tests",
+			"type": "shell",
+			"command": "pnpm --filter @nostr-relay/core run test",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "rerun-tests-2",
+			"type": "shell",
+			"command": "pnpm --filter @nostr-relay/core run test",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

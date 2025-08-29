@@ -10,7 +10,8 @@
     "build": "pnpm -r --filter ./packages/* run build && pnpm -r --filter ./apps/* run build",
     "dev": "pnpm -r --filter ./apps/* run dev",
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+  "typecheck": "pnpm -r run typecheck",
+  "test": "pnpm -r --filter ./packages/* run test"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240821.0"

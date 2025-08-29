@@ -57,6 +57,38 @@ export class EventStore {
 
 export class D1Backend implements EventStoreBackend {
   constructor(private db: D1Database) {}
+  // Exposed for tests
+  static buildQuery(filters: EventFilter[]) {
+    const queries: { sql: string; params: any[] }[] = []
+    for (const f of filters) {
+      const where: string[] = []
+      const params: any[] = []
+      if (Array.isArray((f as any).kinds) && (f as any).kinds.length) {
+        where.push(`kind IN (${(f as any).kinds.map(() => '?').join(',')})`); params.push(...(f as any).kinds)
+      }
+      if (Array.isArray((f as any).authors) && (f as any).authors.length) {
+        where.push(`${(f as any).authors.map(() => 'pubkey LIKE ?').join(' OR ')}`); params.push(...(f as any).authors.map((a: string) => a + '%'))
+      }
+      if (Array.isArray((f as any).ids) && (f as any).ids.length) {
+        where.push(`${(f as any).ids.map(() => 'id LIKE ?').join(' OR ')}`); params.push(...(f as any).ids.map((i: string) => i + '%'))
+      }
+      if (typeof (f as any).since === 'number') { where.push('created_at >= ?'); params.push((f as any).since) }
+      if (typeof (f as any).until === 'number') { where.push('created_at <= ?'); params.push((f as any).until) }
+      const tagClauses: string[] = []
+      for (const [k, vals] of Object.entries(f as any)) {
+        if (k.startsWith('#') && k.length === 2 && Array.isArray(vals)) {
+          const name = k.slice(1)
+          tagClauses.push(`EXISTS (SELECT 1 FROM tags tg WHERE tg.event_id = e.id AND tg.name = ? AND tg.value IN (${(vals as any[]).map(() => '?').join(',')}))`)
+          params.push(name, ...(vals as any[]))
+        }
+      }
+      const fullWhere = [where.join(' AND '), ...tagClauses].filter(Boolean).join(' AND ')
+      const limit = typeof (f as any).limit === 'number' ? Math.max(0, (f as any).limit) : 500
+      const sql = `SELECT e.json FROM events e ${fullWhere ? 'WHERE ' + fullWhere : ''} ORDER BY created_at DESC LIMIT ${limit}`
+      queries.push({ sql, params })
+    }
+    return queries
+  }
   private async init() {
     // Create tables if not exist
     await this.db.exec(`
@@ -115,33 +147,7 @@ export class D1Backend implements EventStoreBackend {
   async query(filters: EventFilter[]): Promise<NostrEvent[]> {
     await this.init()
     const collected: NostrEvent[] = []
-    for (const f of filters) {
-      const where: string[] = []
-      const params: any[] = []
-      if (Array.isArray(f.kinds) && f.kinds.length) {
-        where.push(`kind IN (${f.kinds.map(() => '?').join(',')})`); params.push(...f.kinds)
-      }
-      if (Array.isArray(f.authors) && f.authors.length) {
-        // prefix match using LIKE
-        where.push(`${f.authors.map(() => 'pubkey LIKE ?').join(' OR ')}`); params.push(...f.authors.map((a: string) => a + '%'))
-      }
-      if (Array.isArray(f.ids) && f.ids.length) {
-        where.push(`${f.ids.map(() => 'id LIKE ?').join(' OR ')}`); params.push(...f.ids.map((i: string) => i + '%'))
-      }
-      if (typeof f.since === 'number') { where.push('created_at >= ?'); params.push(f.since) }
-      if (typeof f.until === 'number') { where.push('created_at <= ?'); params.push(f.until) }
-      // tags: support single-letter fields like #e or #p
-      const tagClauses: string[] = []
-      for (const [k, vals] of Object.entries(f)) {
-        if (k.startsWith('#') && k.length === 2 && Array.isArray(vals)) {
-          const name = k.slice(1)
-          tagClauses.push(`EXISTS (SELECT 1 FROM tags tg WHERE tg.event_id = e.id AND tg.name = ? AND tg.value IN (${(vals as any[]).map(() => '?').join(',')}))`)
-          params.push(name, ...(vals as any[]))
-        }
-      }
-      const fullWhere = [where.join(' AND '), ...tagClauses].filter(Boolean).join(' AND ')
-      const limit = typeof f.limit === 'number' ? Math.max(0, f.limit) : 500
-      const sql = `SELECT e.json FROM events e ${fullWhere ? 'WHERE ' + fullWhere : ''} ORDER BY created_at DESC LIMIT ${limit}`
+    for (const { sql, params } of D1Backend.buildQuery(filters)) {
       const rs = await this.db.prepare(sql).bind(...params).all<{ json: string }>()
       const events = (rs.results || []).map(r => JSON.parse(r.json) as NostrEvent)
       collected.push(...events)
