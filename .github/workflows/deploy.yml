@@ -44,6 +44,11 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/relay-worker
           command: secret put ADMIN_KEY --non-interactive --text ${{ secrets.ADMIN_KEY }}
+        env:
+          CONFIG_KV_ID: ${{ secrets.CONFIG_KV_ID }}
+          CONFIG_KV_PREVIEW_ID: ${{ secrets.CONFIG_KV_PREVIEW_ID }}
+          D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
