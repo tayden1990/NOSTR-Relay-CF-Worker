@@ -11,7 +11,7 @@ const ws = new WebSocket("ws://example")
 const setupCtx: any = {
   registerWSMessageHandler: (h: any) => {
     // spam 100 EVENTs quickly
-    ;(async () => {
+    (async () => {
       for (let i = 0; i < 100; i++) await h(ws, ["EVENT", { kind: 1, id: String(i), pubkey: "pk", created_at: i, tags: [], content: "x" }], helpers)
       console.log("out messages:", messages.slice(-3))
     })()
