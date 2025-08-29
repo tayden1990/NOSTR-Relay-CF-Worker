@@ -34,7 +34,7 @@ class MemoryBackend implements EventStoreBackend {
       }
       return true
     }
-    let out: NostrEvent[] = []
+    const out: NostrEvent[] = []
     for (const f of filters) {
       let subset = (await this.all()).filter(e => matches(e, f))
       if (typeof f.limit === 'number') subset = subset.slice(0, f.limit)

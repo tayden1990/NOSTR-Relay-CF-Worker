@@ -82,6 +82,17 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders })
     }
 
+    // Health check endpoint
+    if (path === "/health") {
+      const health = {
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        version: "0.0.1",
+        uptime: Date.now() // Simple uptime indicator
+      }
+      return withCors(json(health))
+    }
+
     // Admin API
     if (path.startsWith("/admin/")) {
       const provided = req.headers.get("x-admin-key") || url.searchParams.get("key") || undefined
@@ -99,6 +110,20 @@ export default {
       if (path === "/admin/schemas" && req.method === "GET") {
         return withCors(json(pm.getAdminSchemas()))
       }
+      if (path === "/admin/health" && req.method === "GET") {
+        const conf = await storage.getAll()
+        const health = {
+          status: "healthy",
+          timestamp: new Date().toISOString(),
+          version: "0.0.1",
+          relay: {
+            name: conf.relay.name,
+            supported_nips: conf.relay.supported_nips,
+            plugins: Object.keys(conf.plugins || {})
+          }
+        }
+        return withCors(json(health))
+      }
     }
 
     // NIP-11 at root per spec
@@ -110,13 +135,21 @@ export default {
 
     // NIP-05: /.well-known/nostr.json?name=
     if (path === "/.well-known/nostr.json") {
-      const name = url.searchParams.get("name") || "_"
+      const _name = url.searchParams.get("name") || "_"
       const conf = await storage.getAll()
       const nip05 = (conf.plugins?.["nip-05"] || {}) as any
       let names: Record<string, string> = {}
       let relays: Record<string, string[]> | undefined
-      try { names = nip05.names ? JSON.parse(nip05.names) : {} } catch {}
-      try { relays = nip05.relays ? JSON.parse(nip05.relays) : undefined } catch {}
+      try { 
+        names = nip05.names ? JSON.parse(nip05.names) : {} 
+      } catch {
+        // ignore parse errors
+      }
+      try { 
+        relays = nip05.relays ? JSON.parse(nip05.relays) : undefined 
+      } catch {
+        // ignore parse errors
+      }
       const body = { names, relays }
       return withCors(json(body))
     }

@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-  "dev": "wrangler dev",
-  "build": "wrangler build",
+    "dev": "wrangler dev",
+    "build": "wrangler build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-  "deploy": "wrangler deploy"
+    "lint": "eslint . --ext .ts",
+    "test": "vitest run",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@nostr-relay/core": "workspace:*",

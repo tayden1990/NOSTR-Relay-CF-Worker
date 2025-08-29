@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,6 +27,18 @@ jobs:
 
       - name: Install deps
         run: pnpm install --frozen-lockfile=false
+
+      - name: Lint code
+        run: pnpm run lint
+
+      - name: Type check
+        run: pnpm run typecheck
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Build packages
+        run: pnpm run build
 
       - name: Publish Worker
         working-directory: apps/relay-worker
