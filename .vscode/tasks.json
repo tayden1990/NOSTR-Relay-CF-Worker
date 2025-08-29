@@ -212,6 +212,36 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "typecheck-after-new-plugins",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "typecheck-final",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "typecheck-nip22",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
 		}
 	]
 }

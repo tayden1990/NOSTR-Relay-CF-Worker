@@ -1,4 +1,4 @@
-import { KVConfigStorage, MemoryConfigStorage, PluginManager, nip11Plugin, nip01Plugin, nip09Plugin, nip13Plugin, nip40Plugin, nip42Plugin, nip45Plugin, nip92Plugin, nip96Plugin, nipEEPlugin, nip94Plugin, EventStore, D1Backend } from "@nostr-relay/core"
+import { KVConfigStorage, MemoryConfigStorage, PluginManager, nip11Plugin, nip01Plugin, nip09Plugin, nip13Plugin, nip40Plugin, nip42Plugin, nip45Plugin, nip92Plugin, nip96Plugin, nipEEPlugin, nip94Plugin, nip05Plugin, nip28Plugin, nip22Plugin, rateLimitPlugin, EventStore, D1Backend } from "@nostr-relay/core"
 import type { EnvBindings, RelayConfig, RelayInfo } from "@nostr-relay/types"
 
 export interface Env extends EnvBindings {}
@@ -39,6 +39,10 @@ export default {
   pm.register(nip96Plugin)
   pm.register(nipEEPlugin)
   pm.register(nip94Plugin)
+  pm.register(nip05Plugin)
+  pm.register(nip28Plugin)
+  pm.register(nip22Plugin)
+  pm.register(rateLimitPlugin)
 
     // Ensure relay supported NIPs reflect plugins
     const cfg = await storage.getAll()
@@ -104,12 +108,16 @@ export default {
       return withCors(json(info))
     }
 
-    // NIP-05 stub for /.well-known/nostr.json?name=
+    // NIP-05: /.well-known/nostr.json?name=
     if (path === "/.well-known/nostr.json") {
       const name = url.searchParams.get("name") || "_"
       const conf = await storage.getAll()
-      const pk = conf.relay.pubkey || "" // optional admin pubkey
-      const body = { names: { [name]: pk } }
+      const nip05 = (conf.plugins?.["nip-05"] || {}) as any
+      let names: Record<string, string> = {}
+      let relays: Record<string, string[]> | undefined
+      try { names = nip05.names ? JSON.parse(nip05.names) : {} } catch {}
+      try { relays = nip05.relays ? JSON.parse(nip05.relays) : undefined } catch {}
+      const body = { names, relays }
       return withCors(json(body))
     }
 
