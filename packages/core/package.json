@@ -1,0 +1,21 @@
+{
+  "name": "@nostr-relay/core",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+  "@nostr-relay/types": "workspace:*",
+  "@noble/curves": "^1.3.0",
+  "@noble/hashes": "^1.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@cloudflare/workers-types": "^4.20240821.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo 'no lint'"
+  }
+}

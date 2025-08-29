@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.wrangler/
+.cache/
+*.log
+**/.DS_Store
+apps/admin-ui/node_modules/
+apps/admin-ui/dist/
+apps/relay-worker/node_modules/
+apps/relay-worker/dist/
+packages/core/node_modules/
+packages/types/node_modules/

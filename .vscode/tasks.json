@@ -1,0 +1,217 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install workspace dependencies with pnpm",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { npm i -g pnpm }; pnpm -v; pnpm install"
+			]
+		},
+		{
+			"label": "Install workspace deps (pnpm)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm install"
+			]
+		},
+		{
+			"label": "Build types and core",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -r --filter @nostr-relay/types --filter @nostr-relay/core run typecheck"
+			]
+		},
+		{
+			"label": "Install hoisted dev deps",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm install"
+			]
+		},
+		{
+			"label": "Typecheck all packages",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -r run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck core only",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -C packages/core run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck packages/core again",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -C packages/core run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck packages/core once more",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -C packages/core run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck all packages after types change",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -r run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck core again (final)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -C packages/core run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck worker and admin after changes",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -r --filter relay-worker --filter nostr-relay-admin-ui run typecheck"
+			]
+		},
+		{
+			"label": "Typecheck after NIP plugins added",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"pnpm -r run typecheck"
+			]
+		},
+		{
+			"label": "typecheck-all",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-all",
+			"type": "shell",
+			"command": "pnpm -r run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "typecheck-all-2",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "typecheck-all-3",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "typecheck-verify",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-all-2",
+			"type": "shell",
+			"command": "pnpm -r run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-all-3",
+			"type": "shell",
+			"command": "pnpm -r run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "final-typecheck",
+			"type": "shell",
+			"command": "pnpm -r run typecheck",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		}
+	]
+}

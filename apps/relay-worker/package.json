@@ -1,0 +1,21 @@
+{
+  "name": "relay-worker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+  "dev": "wrangler dev",
+  "build": "wrangler build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+  "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@nostr-relay/core": "workspace:*",
+    "@nostr-relay/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240821.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.70.0"
+  }
+}

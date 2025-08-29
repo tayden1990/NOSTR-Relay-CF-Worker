@@ -1,0 +1,5 @@
+# Copy to .dev.vars and set values for local dev
+# Loaded by Wrangler during `wrangler dev`.
+
+ADMIN_KEY="dev-admin-key"
+# If using KV in dev, Wrangler will still create temporary preview namespaces automatically if configured.
