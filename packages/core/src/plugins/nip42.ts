@@ -1,5 +1,5 @@
-import type { NipPlugin, WSHelpers, JsonSchema } from "@nostr-relay/types"
-import { getEventHash, verifyEventSignature } from "../crypto"
+import type { NipPlugin, WSHelpers } from "@nostr-relay/types"
+import { verifyEventSignature } from "../crypto"
 
 type Session = { challenge?: string; authedPubkey?: string; issuedAt?: number }
 const sessions = new WeakMap<WebSocket, Session>()
@@ -18,7 +18,7 @@ export const nip42Plugin: NipPlugin<Nip42Config> = {
   setup: ({ registerWSMessageHandler, getConfig }) => {
     registerWSMessageHandler(async (ws, msg, helpers: WSHelpers) => {
       if (!Array.isArray(msg)) return false
-      const [type, payload] = msg
+  const [type, payload] = msg
       const cfg = (await getConfig()) as Nip42Config
       if (type === "EVENT") {
         if (!cfg.requireAuthForPublish) return false

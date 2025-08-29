@@ -1,4 +1,4 @@
-import type { EnvBindings, JsonSchema, NipPlugin } from "@nostr-relay/types"
+import type { JsonSchema, NipPlugin } from "@nostr-relay/types"
 
 type Nip96Config = {
   enabled: boolean
@@ -38,7 +38,7 @@ export const nip96Plugin: NipPlugin<Nip96Config> = {
     }
   } satisfies JsonSchema,
   setup() {},
-  fetch: async (req: Request, env: EnvBindings) => {
+  fetch: async (req: Request) => {
     const url = new URL(req.url)
     if (url.pathname === "/.well-known/nostr/nip96.json") {
       // Serve discovery document from config stored in relay config (plugins.nip-96)

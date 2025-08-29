@@ -1,9 +1,8 @@
-name: Deploy Cloudflare Worker
+name: (disabled) Deploy Cloudflare Worker
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch: {}
+  # Disabled: use .github/workflows/deploy.yml instead
+  workflow_dispatch: { }
 
 jobs:
   test-and-deploy:

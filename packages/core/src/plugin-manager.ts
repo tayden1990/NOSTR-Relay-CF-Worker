@@ -15,7 +15,7 @@ export class PluginManager {
   return Array.from(new Set(nums)).sort((a, b) => a - b)
   }
 
-  async setupAll(env: EnvBindings) {
+  async setupAll(_env: EnvBindings) {
     for (const p of this.plugins) {
       const ctx = {
         log: this.log,

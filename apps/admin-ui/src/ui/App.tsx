@@ -309,7 +309,7 @@ export function App() {
 
   const pluginIds = useMemo(() => Object.keys(schemas), [schemas])
 
-  const hasUnsavedChanges = config !== null
+  // const hasUnsavedChanges = config !== null
 
   // Clear success/error messages after 5 seconds
   React.useEffect(() => {

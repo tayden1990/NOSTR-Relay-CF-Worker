@@ -1,4 +1,4 @@
-import { bytesToHex, getEventHash, type EventLike } from "../crypto"
+import { type EventLike } from "../crypto"
 
 export type Nip98Template = {
   kind: 27235

@@ -8,34 +8,6 @@ type Nip01Config = {
   blockPubkeys: string[]
 }
 
-function matchesFilter(ev: NostrEvent, f: any): boolean {
-  if (f.ids && Array.isArray(f.ids)) {
-    if (!f.ids.some((id: string) => ev.id.startsWith(id))) return false
-  }
-  if (f.kinds && Array.isArray(f.kinds)) {
-    if (!f.kinds.includes(ev.kind)) return false
-  }
-  if (f.authors && Array.isArray(f.authors)) {
-    if (!f.authors.some((a: string) => ev.pubkey.startsWith(a))) return false
-  }
-  if (f.since && typeof f.since === 'number') {
-    if (ev.created_at < f.since) return false
-  }
-  if (f.until && typeof f.until === 'number') {
-    if (ev.created_at > f.until) return false
-  }
-  if (f.limit && typeof f.limit === 'number') {
-    // limit applied by caller, not here
-  }
-  // tags
-  for (const [k, vals] of Object.entries(f)) {
-    if (k.length === 1 && Array.isArray(vals)) {
-      const tagVals = ev.tags.filter(t => t[0] === k).map(t => t[1])
-      if (!vals.some((v: string) => tagVals.includes(v))) return false
-    }
-  }
-  return true
-}
 
 export const nip01Plugin: NipPlugin<Nip01Config> = {
   id: "nip-01",
@@ -54,7 +26,7 @@ export const nip01Plugin: NipPlugin<Nip01Config> = {
     },
     required: ["maxEventSizeBytes"]
   } satisfies JsonSchema,
-  setup: ({ registerWSMessageHandler, getConfig, log }) => {
+  setup: ({ registerWSMessageHandler, getConfig }) => {
     registerWSMessageHandler(async (ws, msg, helpers: WSHelpers) => {
       if (!Array.isArray(msg)) return false
       const [type, ...rest] = msg

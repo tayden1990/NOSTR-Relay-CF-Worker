@@ -1,4 +1,4 @@
-import type { NipPlugin, NostrEvent, WSHelpers, JsonSchema } from "@nostr-relay/types"
+import type { NipPlugin, NostrEvent, WSHelpers } from "@nostr-relay/types"
 
 type Nip13Config = { minDifficulty: number }
 

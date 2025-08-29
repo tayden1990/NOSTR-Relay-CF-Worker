@@ -1,4 +1,4 @@
-import type { NipPlugin, NostrEvent, WSHelpers, JsonSchema } from "@nostr-relay/types"
+import type { NipPlugin, WSHelpers, NostrEvent } from "@nostr-relay/types"
 
 type Nip40Config = { rejectExpired: boolean }
 
@@ -17,7 +17,7 @@ export const nip40Plugin: NipPlugin<Nip40Config> = {
       const [type, ...rest] = msg
       if (type !== "EVENT") return false
       const ev = rest[0] as NostrEvent
-      const exp = ev.tags.find(t => t[0] === 'expiration')?.[1]
+  const exp = ev.tags.find((t: string[]) => t[0] === 'expiration')?.[1]
       if (!exp) return false
       const cfg = (await getConfig()) as Nip40Config
       const now = Math.floor(Date.now() / 1000)

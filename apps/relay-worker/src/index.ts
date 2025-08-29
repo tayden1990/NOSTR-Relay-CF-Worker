@@ -135,7 +135,7 @@ export default {
 
     // NIP-05: /.well-known/nostr.json?name=
     if (path === "/.well-known/nostr.json") {
-      const _name = url.searchParams.get("name") || "_"
+  // name param is supported by spec but we ignore it currently
       const conf = await storage.getAll()
       const nip05 = (conf.plugins?.["nip-05"] || {}) as any
       let names: Record<string, string> = {}

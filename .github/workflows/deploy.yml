@@ -36,6 +36,18 @@ jobs:
         run: pnpm --filter nostr-relay-admin-ui run build
         continue-on-error: true
 
+      - name: Inject wrangler.toml bindings from secrets
+        working-directory: apps/relay-worker
+        run: |
+          sed -i "s|\${CONFIG_KV_ID}|${CONFIG_KV_ID}|g" wrangler.toml
+          sed -i "s|\${CONFIG_KV_PREVIEW_ID}|${CONFIG_KV_PREVIEW_ID}|g" wrangler.toml
+          sed -i "s|\${D1_DATABASE_NAME}|${D1_DATABASE_NAME}|g" wrangler.toml
+          sed -i "s|\${D1_DATABASE_ID}|${D1_DATABASE_ID}|g" wrangler.toml
+        env:
+          CONFIG_KV_ID: ${{ secrets.CONFIG_KV_ID }}
+          CONFIG_KV_PREVIEW_ID: ${{ secrets.CONFIG_KV_PREVIEW_ID }}
+          D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
 
       - name: Put ADMIN_KEY secret
         uses: cloudflare/wrangler-action@v3

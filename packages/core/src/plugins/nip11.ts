@@ -1,4 +1,4 @@
-import type { EnvBindings, JsonSchema, NipPlugin, RelayInfo } from "@nostr-relay/types"
+import type { JsonSchema, NipPlugin, RelayInfo } from "@nostr-relay/types"
 
 type Nip11Config = RelayInfo
 
@@ -26,17 +26,7 @@ export const nip11Plugin: NipPlugin<Nip11Config> = {
     },
     required: ["name", "description"]
   } satisfies JsonSchema,
-  setup() {},
-  fetch: async (req, env: EnvBindings) => {
-    const url = new URL(req.url)
-    if (url.pathname === "/" || url.pathname === "/.well-known/nostr.json") {
-      // not NIP-11
-      return undefined
-    }
-    if (url.pathname === "/") return undefined
-    // Reserve path for future expansion
-    return undefined
-  }
+  setup() {}
 }
 
 export default nip11Plugin
