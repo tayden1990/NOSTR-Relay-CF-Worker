@@ -40,9 +40,9 @@ function Field({ name, schema, value, onChange }: FieldProps) {
     return (
       <input 
         style={inputStyle}
-        value={value ?? ''} 
+        value={value ?? schema.default ?? ''} 
         onChange={e => onChange(e.target.value)} 
-        placeholder={schema.description || schema.title || name} 
+        placeholder={schema.placeholder || (schema.description && schema.description.length > 100 ? schema.title || name : schema.description) || schema.title || name} 
       />
     )
   }
@@ -52,9 +52,9 @@ function Field({ name, schema, value, onChange }: FieldProps) {
       <input 
         style={inputStyle}
         type="number" 
-        value={value ?? 0} 
+        value={value ?? schema.default ?? 0} 
         onChange={e => onChange(Number(e.target.value))} 
-        placeholder={schema.description || schema.title || name}
+        placeholder={schema.placeholder || schema.title || name}
         min={schema.minimum}
         max={schema.maximum}
       />
@@ -62,11 +62,12 @@ function Field({ name, schema, value, onChange }: FieldProps) {
   }
   
   if (t === 'boolean') {
+    const isChecked = value !== undefined ? !!value : !!schema.default
     return (
       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
         <input 
           type="checkbox" 
-          checked={!!value} 
+          checked={isChecked} 
           onChange={e => onChange(e.target.checked)} 
           style={{ margin: 0 }}
         />
@@ -275,6 +276,124 @@ export function App() {
     }
   }
 
+  function loadDemo() {
+    // Create demo schemas and config to showcase the UI improvements
+    const demoSchemas: Record<string, JsonSchema> = {
+      "nip-01": {
+        type: "object",
+        properties: {
+          maxEventSizeBytes: { 
+            type: "number", 
+            title: "Max event size (bytes)", 
+            default: 100000,
+            description: "Maximum size in bytes for individual events (NIP-01). Recommended: 100KB for general use, 65KB for resource-constrained relays, 1MB for media-heavy relays. Larger events consume more bandwidth and storage."
+          },
+          allowKinds: { 
+            type: "array", 
+            title: "Allowed event kinds", 
+            items: { type: "number" },
+            description: "Whitelist of event kinds to accept (empty = accept all). Common kinds: 0=user metadata, 1=text notes, 3=contacts, 4=encrypted DMs, 5=event deletion, 6=reposts, 7=reactions. Use to create specialized relays (e.g., [0,1,7] for social posts only)."
+          },
+          blockPubkeys: { 
+            type: "array", 
+            title: "Blocked public keys", 
+            items: { type: "string" },
+            description: "List of 64-character hex public keys to block from posting. Use for spam prevention and content moderation. Example: 'abcd1234efgh5678...' (32 bytes hex encoded)."
+          }
+        },
+        required: ["maxEventSizeBytes"]
+      } as JsonSchema,
+      "nip-05": {
+        type: "object",
+        properties: {
+          enabled: { 
+            type: "boolean", 
+            title: "Enable NIP-05 identifier mapping", 
+            default: true,
+            description: "Enables DNS-based Nostr identifiers (user@domain.com format). Allows users to have human-readable addresses that map to their public keys via your domain's /.well-known/nostr.json endpoint."
+          },
+          names: { 
+            type: "string", 
+            title: "Name to public key mappings (JSON)", 
+            default: `{
+  "alice": "npub1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d",
+  "bob": "npub1z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0f9e8d7c6b5a4321098"
+}`,
+            description: "JSON object mapping names to public keys. Use '_' for the root domain identifier (domain.com). Names should be lowercase alphanumeric with dots, dashes, underscores. Public keys in npub format or 64-char hex."
+          }
+        }
+      } as JsonSchema,
+      "nip-22": {
+        type: "object",
+        properties: {
+          enabled: { 
+            type: "boolean", 
+            title: "Enable content validation", 
+            default: true,
+            description: "Enables NIP-22 content validation and moderation features. Provides comprehensive filtering capabilities for spam prevention and content policy enforcement."
+          },
+          blockedWords: { 
+            type: "array", 
+            title: "Blocked words in content", 
+            items: { type: "string" },
+            description: "Case-insensitive words to block in event content. Useful for basic spam/abuse prevention. Example words: 'spam', 'scam', 'viagra'. Use sparingly to avoid false positives."
+          }
+        }
+      } as JsonSchema,
+      "rate-limit": {
+        type: "object",
+        properties: {
+          enabled: { 
+            type: "boolean", 
+            title: "Enable rate limiting", 
+            default: true,
+            description: "Protects your relay from spam and abuse by limiting how fast users can post events. Essential for public relays to prevent resource exhaustion and maintain service quality."
+          },
+          eventsPerMinute: { 
+            type: "number", 
+            title: "Events per minute limit", 
+            default: 60, 
+            minimum: 1,
+            description: "Maximum events a user can post per minute under normal conditions. Recommended: 60 for general use, 30 for conservative, 120 for high-activity communities. Higher values allow more activity but increase spam risk."
+          }
+        }
+      } as JsonSchema
+    }
+    
+    const demoConfig: ConfigData = {
+      relay: {
+        name: "My Nostr Relay",
+        description: "A welcoming community relay for thoughtful discussions and meaningful connections. We encourage respectful dialogue and support free expression within our community guidelines.",
+        software: "nostr-relay-cf-worker",
+        version: "0.0.1",
+        supported_nips: [1, 9, 11, 22]
+      },
+      plugins: {
+        "nip-01": {
+          maxEventSizeBytes: 100000,
+          allowKinds: [],
+          blockPubkeys: []
+        },
+        "nip-05": {
+          enabled: true,
+          names: "{}"
+        },
+        "nip-22": {
+          enabled: true,
+          blockedWords: ["spam", "scam"]
+        },
+        "rate-limit": {
+          enabled: true,
+          eventsPerMinute: 60
+        }
+      }
+    }
+    
+    setSchemas(demoSchemas)
+    setConfig(demoConfig)
+    setSuccess('Demo configuration loaded - showcasing enhanced UI guidance!')
+  }
+
   async function save() {
     if (!config) return
 
@@ -409,6 +528,21 @@ export function App() {
               {busy ? 'Loading...' : 'Load Config'}
             </button>
             <button 
+              onClick={loadDemo} 
+              style={{
+                padding: '12px 20px',
+                border: '2px solid #9b59b6',
+                borderRadius: '4px',
+                backgroundColor: 'white',
+                color: '#9b59b6',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              📖 Demo Mode
+            </button>
+            <button 
               onClick={() => setShowConfirmSave(true)} 
               disabled={!config || busy}
               style={{
@@ -482,18 +616,54 @@ export function App() {
                     schema={{ 
                       type: 'object', 
                       properties: {
-                        name: { type: 'string', title: 'Relay Name', description: 'A human-readable name for your relay' },
-                        description: { type: 'string', title: 'Description', description: 'Brief description of your relay' },
-                        pubkey: { type: 'string', title: 'Relay Pubkey', description: 'Public key of the relay operator (optional)' },
-                        contact: { type: 'string', title: 'Contact Info', description: 'Contact information for the relay operator' },
-                        software: { type: 'string', title: 'Software', description: 'Software name and version' },
-                        version: { type: 'string', title: 'Version', description: 'Version of the relay software' },
-                        payments_url: { type: 'string', title: 'Payments URL', description: 'URL for payment information (Lightning, etc.)' },
+                        name: { 
+                          type: 'string', 
+                          title: 'Relay Name', 
+                          description: 'A memorable name for your relay (max 30 chars recommended). This appears in relay lists and helps users identify your relay. Choose something that reflects your community or purpose.',
+                          default: 'My Nostr Relay'
+                        },
+                        description: { 
+                          type: 'string', 
+                          title: 'Description', 
+                          description: 'Detailed description of your relay\'s purpose, community guidelines, and posting rules. Use double newlines for paragraphs. Be clear about what content is welcome and any moderation policies.',
+                          default: 'A welcoming community relay for thoughtful discussions and meaningful connections. We encourage respectful dialogue and support free expression within our community guidelines.'
+                        },
+                        pubkey: { 
+                          type: 'string', 
+                          title: 'Admin Public Key', 
+                          description: 'Your public key as relay administrator (64-char hex or npub format). Users can send you encrypted direct messages for abuse reports, technical issues, or questions. Highly recommended for transparency and trust.',
+                          placeholder: 'npub1... or 64-character hex public key'
+                        },
+                        contact: { 
+                          type: 'string', 
+                          title: 'Contact Information', 
+                          description: 'Alternative contact method for users and other relay operators. Use mailto: for email or https: for websites. Provides a backup contact method beyond your public key.',
+                          placeholder: 'mailto:admin@yourrelay.com or https://yourrelay.com/contact'
+                        },
+                        software: { 
+                          type: 'string', 
+                          title: 'Software URL', 
+                          description: 'URL to your relay software\'s homepage or repository. Helps users understand your implementation and find documentation. Leave default unless using custom software.',
+                          default: 'https://github.com/tayden1990/NOSTR-Relay-CF-Worker'
+                        },
+                        version: { 
+                          type: 'string', 
+                          title: 'Software Version', 
+                          description: 'Version identifier for tracking and debugging. Can be semantic version (1.0.0), git commit (abc123), or date (2024-01-15). Useful for compatibility checks.',
+                          default: '1.0.0'
+                        },
+                        payments_url: { 
+                          type: 'string', 
+                          title: 'Payments URL', 
+                          description: 'Optional URL for relay subscription payments or donations. Link to Lightning invoices, payment processors, or donation pages. Leave empty for free relays.',
+                          placeholder: 'https://yourrelay.com/subscribe or lightning payment URL'
+                        },
                         supported_nips: { 
                           type: 'array', 
                           title: 'Supported NIPs', 
-                          description: 'List of supported Nostr Implementation Possibilities (auto-populated)',
-                          items: { type: 'number' } 
+                          description: 'List of NIP numbers your relay implements. Automatically populated based on enabled plugins. Common NIPs: 1 (basic), 9 (deletion), 11 (relay info), 22 (validation), 42 (auth). Read-only in most cases.',
+                          items: { type: 'number' },
+                          default: [1, 9, 11, 22]
                         }
                       },
                       required: ['name']

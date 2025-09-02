@@ -32,15 +32,38 @@ export const nip92Plugin: NipPlugin<Nip92Config> = {
     enabled: true,
     enforceImetaUrlMatch: false,
     allowedDomains: [],
-    blockedDomains: []
+    blockedDomains: [
+      "malicious-site.com",
+      "spam-images.net"
+    ]
   },
   configSchema: {
     type: "object",
     properties: {
-      enabled: { type: "boolean", title: "Enable validations", default: true },
-      enforceImetaUrlMatch: { type: "boolean", title: "Require imeta url to appear in content", default: false },
-      allowedDomains: { type: "array", title: "Allowed media domains (empty = any)", items: { type: "string" } },
-      blockedDomains: { type: "array", title: "Blocked media domains", items: { type: "string" } }
+      enabled: { 
+        type: "boolean", 
+        title: "Enable media attachment validation", 
+        default: true,
+        description: "Validates media attachments in events using NIP-92 imeta tags. Helps prevent spam and malicious content by checking media URLs against allow/block lists."
+      },
+      enforceImetaUrlMatch: { 
+        type: "boolean", 
+        title: "Require imeta URLs to appear in content", 
+        default: false,
+        description: "When enabled, requires that imeta tag URLs also appear in the event content. Stricter validation but may reject some legitimate media posts. Recommended for high-security relays."
+      },
+      allowedDomains: { 
+        type: "array", 
+        title: "Allowed media domains", 
+        items: { type: "string" },
+        description: "Whitelist of domains for media URLs (empty = allow all). Use for strict content control. Popular media hosts: 'nostr.build', 'void.cat', 'imgur.com', 'i.imgur.com'. Format: 'domain.com' (no protocol)."
+      },
+      blockedDomains: { 
+        type: "array", 
+        title: "Blocked media domains", 
+        items: { type: "string" },
+        description: "Blacklist of domains to reject for media URLs. Use to block known spam or malicious hosts. Takes precedence over allowed domains. Format: 'domain.com' (no protocol)."
+      }
     }
   } satisfies JsonSchema,
   setup: ({ registerWSMessageHandler, getConfig }) => {

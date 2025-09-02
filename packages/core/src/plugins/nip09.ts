@@ -9,7 +9,14 @@ export const nip09Plugin: NipPlugin<Nip09Config> = {
   defaultConfig: { allowDeletes: true },
   configSchema: {
     type: "object",
-    properties: { allowDeletes: { type: "boolean", title: "Allow deletion requests", default: true } },
+    properties: { 
+      allowDeletes: { 
+        type: "boolean", 
+        title: "Allow deletion requests", 
+        default: true,
+        description: "Enables NIP-09 event deletion. When enabled, users can delete their own events by publishing kind 5 events. Useful for content moderation and user privacy, but some relays disable this to maintain historical records."
+      } 
+    },
     required: []
   },
   setup: ({ registerWSMessageHandler, getConfig }) => {
