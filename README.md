@@ -245,3 +245,86 @@ pnpm typecheck   # Run TypeScript compiler checks
 ## License
 
 MIT License - see LICENSE file for details.
+
+
+
+
+
+
+
+
+
+
+Checklist:
+
+Connect a Nostr client to your relay.
+Try basic queries and publish over WebSocket.
+Use admin endpoints with your ADMIN_KEY.
+(Optional) Configure NIP-05 and NIP-96 docs.
+Relay endpoints:
+
+WebSocket (use this in clients): wss://nostr-relay-worker.t-ak-sa.workers.dev/ws
+NIP-11 info (GET): https://nostr-relay-worker.t-ak-sa.workers.dev/
+Admin API (needs x-admin-key): https://nostr-relay-worker.t-ak-sa.workers.dev/admin/…
+GET /admin/health
+GET /admin/config
+GET /admin/schemas
+PUT /admin/config (JSON body)
+NIP-05: https://nostr-relay-worker.t-ak-sa.workers.dev/.well-known/nostr.json
+NIP-96: https://nostr-relay-worker.t-ak-sa.workers.dev/.well-known/nostr/nip96.json
+Use it from a Nostr client:
+
+Add relay URL: wss://nostr-relay-worker.t-ak-sa.workers.dev/ws
+Subscribe: send ["REQ","sub-1",{ "kinds":[1], "limit":5 }] then expect ["EVENT","sub-1",event…] … ["EOSE","sub-1"]
+Publish: send ["EVENT", nostrEvent]
+Must be a valid NIP-01 event: id = sha256(serialized); valid schnorr sig; within size; allowed kind.
+If AUTH is required (NIP-42):
+
+On first EVENT, server replies ["AUTH","<challenge>"].
+Respond with ["AUTH", authEvent] where authEvent is kind 22242, tags include ["challenge","<challenge>"] and ["relay","wss://nostr-relay-worker.t-ak-sa.workers.dev/ws"], signed by the same pubkey you’ll publish with.
+After ["OK", authEvent.id, true, ""], resend your EVENT.
+Admin configuration:
+
+Read config: GET /admin/config with header x-admin-key: your ADMIN_KEY.
+Update config: PUT /admin/config with JSON; useful tweaks:
+Enable NIP-42 enforcement: plugins["nip-42"].requireAuthForPublish = true
+NIP-22 moderation: plugins["nip-22"] fields like blockedAuthors, bannedKinds, blockedWords, etc.
+NIP-05: plugins["nip-05"].names (JSON string mapping names to pubkeys) and relays (JSON string mapping pubkeys to relay arrays).
+Schemas for the admin UI form: GET /admin/schemas.
+Notes:
+
+Some clients expect the relay root to upgrade to WS, but your WS endpoint is at /ws. Always use the /ws path.
+Check supported NIPs via GET /; it reflects registered plugins.
+Rate limiting is enabled; you may see ["NOTICE","rate-limited"] on bursts.
+If you bound D1, event storage is persistent; otherwise it falls back to memory.
+Want quick sanity checks or sample payloads? Say the word and I’ll paste minimal REQ/EVENT/AUTH examples you can copy into your WebSocket client.
+
+
+
+
+
+
+Quick steps:
+
+Start the Admin UI locally:
+In the repo root, run:
+pnpm install
+pnpm --filter nostr-relay-admin-ui run dev
+Open http://localhost:5173
+In the Admin UI header:
+Base URL: https://nostr-relay-worker.t-ak-sa.workers.dev
+Admin Key: the same ADMIN_KEY you set in GitHub Secrets
+Click “Load config” (or similar), edit settings, then “Save” (it’ll ask to confirm).
+What the UI calls under the hood:
+GET /admin/health, /admin/config, /admin/schemas
+PUT /admin/config (with x-admin-key in headers)
+Optional direct check (PowerShell):
+
+Read config:
+Invoke-RestMethod -Uri "https://nostr-relay-worker.t-ak-sa.workers.dev/admin/config" -Headers @{ "x-admin-key" = "<ADMIN_KEY>" }
+Save config:
+Invoke-RestMethod -Method Put -Uri "https://nostr-relay-worker.t-ak-sa.workers.dev/admin/config" -Headers @{ "x-admin-key" = "<ADMIN_KEY>"; "content-type" = "application/json" } -Body ($jsonConfig | ConvertTo-Json -Depth 10)
+Tip:
+
+CORS is open, so the local UI can talk to your Worker.
+To host the UI, you can deploy apps/admin-ui to Cloudflare Pages and keep using the same Base URL and Admin Key.
