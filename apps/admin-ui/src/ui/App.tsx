@@ -362,10 +362,10 @@ export function App() {
     
     const demoConfig: ConfigData = {
       relay: {
-        name: "My Community Relay",
+        name: "My Nostr Relay",
         description: "A welcoming community relay for thoughtful discussions and meaningful connections. We encourage respectful dialogue and support free expression within our community guidelines.",
-        software: "https://github.com/tayden1990/NOSTR-Relay-CF-Worker",
-        version: "1.0.0",
+        software: "nostr-relay-cf-worker",
+        version: "0.0.1",
         supported_nips: [1, 9, 11, 22]
       },
       plugins: {
@@ -620,7 +620,7 @@ export function App() {
                           type: 'string', 
                           title: 'Relay Name', 
                           description: 'A memorable name for your relay (max 30 chars recommended). This appears in relay lists and helps users identify your relay. Choose something that reflects your community or purpose.',
-                          default: 'My Community Relay'
+                          default: 'My Nostr Relay'
                         },
                         description: { 
                           type: 'string', 

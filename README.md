@@ -7,12 +7,15 @@ This monorepo scaffolds a modular Nostr Relay built for Cloudflare Workers, with
 ## Features
 
 - 🔌 **Plugin Architecture**: Modular NIP implementations with easy extensibility
-- 🎨 **Modern Admin UI**: Clean, responsive interface for configuration management
+- 🎨 **Modern Admin UI**: Clean, responsive interface for configuration management with enhanced user guidance
 - ☁️ **Cloudflare Workers**: Serverless deployment with global edge distribution
-- 🔐 **Secure Configuration**: Admin key authentication and input validation
+- 🔐 **Secure Configuration**: Admin key authentication and comprehensive input validation
 - 📱 **Mobile Friendly**: Responsive design that works on all devices
 - ⚡ **Performance**: Fast loading and optimized bundle sizes
 - 🧪 **Well Tested**: Comprehensive test suite with 100% pass rate
+- 🔧 **Easy Configuration**: JSON schema-driven config forms with helpful descriptions
+- 🛡️ **Rate Limiting**: Built-in protection against spam and abuse
+- 🗃️ **Flexible Storage**: Support for both KV and in-memory configuration storage
 
 ## Architecture
 
@@ -36,8 +39,8 @@ This monorepo scaffolds a modular Nostr Relay built for Cloudflare Workers, with
 - NIP-92: Media attachments
 - NIP-94: File metadata
 - NIP-96: HTTP file storage integration
-- NIP-EE: Parameterized replaceable events
-- Rate limiting plugin
+- NIP-445: Extended events (custom implementation for key packages, welcome events, and group events)
+- Rate limiting plugin (custom utility)
 
 ## Quick Start
 
@@ -151,7 +154,17 @@ pnpm build
    - NIP-11 info: `curl -H "Accept: application/nostr+json" https://your-worker.your-account.workers.dev`
    - Admin UI: Deploy the admin-ui separately or use locally
 
+**Note**: When CONFIG_KV is not available (e.g., in tests), the relay will use in-memory storage with the default configuration values.
+
 ## Configuration
+
+### Default Relay Settings
+When first deployed, the relay starts with these default settings:
+- **Name**: "My Nostr Relay"
+- **Software**: "nostr-relay-cf-worker"
+- **Version**: "0.0.1"
+- **Description**: "A welcoming community relay for thoughtful discussions and meaningful connections..."
+- **Supported NIPs**: Automatically populated based on enabled plugins
 
 ### Relay Information
 Configure basic relay metadata like name, description, contact info, and supported NIPs through the Admin UI.
@@ -222,6 +235,11 @@ pnpm typecheck   # Run TypeScript compiler checks
 - Verify Cloudflare credentials and account ID
 - Check that KV and D1 bindings are properly configured
 - Ensure wrangler.toml has correct binding IDs
+- If tests fail during deployment, ensure DEFAULT_CONFIG matches test expectations
+
+**NIP-11 info endpoint returns unexpected values:**
+- Check that DEFAULT_CONFIG in packages/core/src/storage.ts has the correct values
+- The default relay name should be "My Nostr Relay" and software should be "nostr-relay-cf-worker"
 
 **Plugin configuration not saving:**
 - Check browser console for errors
