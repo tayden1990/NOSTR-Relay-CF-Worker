@@ -12,7 +12,14 @@ export const nip42Plugin: NipPlugin<Nip42Config> = {
   defaultConfig: { requireAuthForPublish: false },
   configSchema: {
     type: "object",
-    properties: { requireAuthForPublish: { type: "boolean", title: "Require AUTH for publish", default: false } },
+    properties: { 
+      requireAuthForPublish: { 
+        type: "boolean", 
+        title: "Require authentication for publishing", 
+        default: false,
+        description: "Enables NIP-42 authentication requirement for posting events. When enabled, users must authenticate with their private key before publishing. Increases security but reduces ease of use. Recommended for private or paid relays."
+      } 
+    },
     required: []
   },
   setup: ({ registerWSMessageHandler, getConfig }) => {

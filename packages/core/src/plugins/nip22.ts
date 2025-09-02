@@ -18,23 +18,63 @@ export const nip22Plugin: NipPlugin<Nip22Config> = {
     enabled: true,
     allowReplaceableKinds: true,
     requireTargetForReactions: true,
-    blockedWords: [],
+    blockedWords: ["spam", "scam", "porn"],
     blockedAuthors: [],
     bannedKinds: [],
-    requireContentForKinds: [],
+    requireContentForKinds: [1],
     contentRegexes: []
   },
   configSchema: {
     type: "object",
     properties: {
-      enabled: { type: "boolean", title: "Enable NIP-22 checks", default: true },
-      allowReplaceableKinds: { type: "boolean", title: "Allow replaceable kinds (30000-39999)", default: true },
-      requireTargetForReactions: { type: "boolean", title: "Require e/p tag on kind 7 reactions", default: true },
-      blockedWords: { type: "array", title: "Block if content includes any of these words", items: { type: "string" } },
-      blockedAuthors: { type: "array", title: "Blocked pubkeys", items: { type: "string" } },
-      bannedKinds: { type: "array", title: "Blocked kinds", items: { type: "number" } },
-      requireContentForKinds: { type: "array", title: "Require non-empty content for kinds", items: { type: "number" } },
-      contentRegexes: { type: "array", title: "Block if content matches any regex (JS)", items: { type: "string" } }
+      enabled: { 
+        type: "boolean", 
+        title: "Enable content validation", 
+        default: true,
+        description: "Enables NIP-22 content validation and moderation features. Provides comprehensive filtering capabilities for spam prevention and content policy enforcement."
+      },
+      allowReplaceableKinds: { 
+        type: "boolean", 
+        title: "Allow replaceable events (kinds 30000-39999)", 
+        default: true,
+        description: "Permits replaceable/addressable events like profiles, relay lists, etc. Disable only if you want to prevent dynamic content updates. Most relays should keep this enabled."
+      },
+      requireTargetForReactions: { 
+        type: "boolean", 
+        title: "Require target for reactions (kind 7)", 
+        default: true,
+        description: "Requires reaction events to reference a target event or pubkey via 'e' or 'p' tags. Prevents meaningless reactions and ensures reactions have context."
+      },
+      blockedWords: { 
+        type: "array", 
+        title: "Blocked words in content", 
+        items: { type: "string" },
+        description: "Case-insensitive words to block in event content. Useful for basic spam/abuse prevention. Example words: 'spam', 'scam', 'viagra'. Use sparingly to avoid false positives."
+      },
+      blockedAuthors: { 
+        type: "array", 
+        title: "Blocked author public keys", 
+        items: { type: "string" },
+        description: "List of public keys (64-char hex) to block completely. Alternative to NIP-01 blockPubkeys. Use for persistent spammers or banned users."
+      },
+      bannedKinds: { 
+        type: "array", 
+        title: "Banned event kinds", 
+        items: { type: "number" },
+        description: "Event kinds to reject completely. Use to disable specific event types. Example: block kind 4 (encrypted DMs) for public-only relays, or kind 1984 (reporting) to avoid drama."
+      },
+      requireContentForKinds: { 
+        type: "array", 
+        title: "Require non-empty content for kinds", 
+        items: { type: "number" },
+        description: "Event kinds that must have non-empty content. Default requires content for kind 1 (text notes). Prevents empty posts and spam. Add other kinds as needed: 30023 (articles), etc."
+      },
+      contentRegexes: { 
+        type: "array", 
+        title: "Block content matching regex patterns", 
+        items: { type: "string" },
+        description: "JavaScript regular expressions to match against content. Powerful but complex - test carefully! Example: '^https://spam-site\\.com' to block specific URLs. Use with caution."
+      }
     }
   } satisfies JsonSchema,
   setup: ({ registerWSMessageHandler, getConfig }) => {
