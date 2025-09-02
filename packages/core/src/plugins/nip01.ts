@@ -20,9 +20,24 @@ export const nip01Plugin: NipPlugin<Nip01Config> = {
   configSchema: {
     type: "object",
     properties: {
-      maxEventSizeBytes: { type: "number", title: "Max event size (bytes)", default: 100000 },
-      allowKinds: { type: "array", title: "Allowed kinds (empty = all)", items: { type: "number" } },
-      blockPubkeys: { type: "array", title: "Blocked pubkeys", items: { type: "string" } }
+      maxEventSizeBytes: { 
+        type: "number", 
+        title: "Max event size (bytes)", 
+        default: 100000,
+        description: "Maximum size in bytes for individual events (NIP-01). Recommended: 100KB for general use, 65KB for resource-constrained relays, 1MB for media-heavy relays. Larger events consume more bandwidth and storage."
+      },
+      allowKinds: { 
+        type: "array", 
+        title: "Allowed event kinds", 
+        items: { type: "number" },
+        description: "Whitelist of event kinds to accept (empty = accept all). Common kinds: 0=user metadata, 1=text notes, 3=contacts, 4=encrypted DMs, 5=event deletion, 6=reposts, 7=reactions. Use to create specialized relays (e.g., [0,1,7] for social posts only)."
+      },
+      blockPubkeys: { 
+        type: "array", 
+        title: "Blocked public keys", 
+        items: { type: "string" },
+        description: "List of 64-character hex public keys to block from posting. Use for spam prevention and content moderation. Example: 'abcd1234efgh5678...' (32 bytes hex encoded)."
+      }
     },
     required: ["maxEventSizeBytes"]
   } satisfies JsonSchema,

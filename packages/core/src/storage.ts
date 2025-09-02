@@ -3,11 +3,11 @@ import type { ConfigStorage } from "./plugin-manager"
 
 const DEFAULT_CONFIG: RelayConfig = {
   relay: {
-    name: "My Nostr Relay",
-    description: "A modular NIP-enabled relay",
-    software: "nostr-relay-cf-worker",
-    version: "0.0.1",
-    supported_nips: []
+    name: "My Community Relay",
+    description: "A welcoming community relay for thoughtful discussions and meaningful connections. We encourage respectful dialogue and support free expression within our community guidelines.",
+    software: "https://github.com/tayden1990/NOSTR-Relay-CF-Worker",
+    version: "1.0.0",
+    supported_nips: [1, 9, 11, 22]
   },
   plugins: {}
 }

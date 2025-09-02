@@ -16,10 +16,33 @@ export const rateLimitPlugin: NipPlugin<RateLimitConfig> = {
   configSchema: {
     type: "object",
     properties: {
-      enabled: { type: "boolean", title: "Enable rate limit", default: true },
-      eventsPerMinute: { type: "number", title: "EVENTs per minute", default: 60, minimum: 1 },
-      burst: { type: "number", title: "Burst allowance", default: 30, minimum: 1 },
-      blockSeconds: { type: "number", title: "Block seconds on overflow", default: 10, minimum: 0 }
+      enabled: { 
+        type: "boolean", 
+        title: "Enable rate limiting", 
+        default: true,
+        description: "Protects your relay from spam and abuse by limiting how fast users can post events. Essential for public relays to prevent resource exhaustion and maintain service quality."
+      },
+      eventsPerMinute: { 
+        type: "number", 
+        title: "Events per minute limit", 
+        default: 60, 
+        minimum: 1,
+        description: "Maximum events a user can post per minute under normal conditions. Recommended: 60 for general use, 30 for conservative, 120 for high-activity communities. Higher values allow more activity but increase spam risk."
+      },
+      burst: { 
+        type: "number", 
+        title: "Burst allowance", 
+        default: 30, 
+        minimum: 1,
+        description: "Additional events allowed in short bursts beyond the per-minute rate. Helps legitimate users who post several related events quickly. Should be 25-50% of the per-minute limit."
+      },
+      blockSeconds: { 
+        type: "number", 
+        title: "Block duration (seconds)", 
+        default: 10, 
+        minimum: 0,
+        description: "How long to block a user after they exceed the rate limit. Recommended: 10-60 seconds. Longer blocks reduce spam effectiveness but may frustrate legitimate users."
+      }
     },
     required: ["eventsPerMinute"]
   } satisfies JsonSchema,
