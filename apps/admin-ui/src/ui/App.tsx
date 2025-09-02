@@ -278,7 +278,7 @@ export function App() {
 
   function loadDemo() {
     // Create demo schemas and config to showcase the UI improvements
-    const demoSchemas = {
+    const demoSchemas: Record<string, JsonSchema> = {
       "nip-01": {
         type: "object",
         properties: {
@@ -302,7 +302,7 @@ export function App() {
           }
         },
         required: ["maxEventSizeBytes"]
-      },
+      } as JsonSchema,
       "nip-05": {
         type: "object",
         properties: {
@@ -322,7 +322,7 @@ export function App() {
             description: "JSON object mapping names to public keys. Use '_' for the root domain identifier (domain.com). Names should be lowercase alphanumeric with dots, dashes, underscores. Public keys in npub format or 64-char hex."
           }
         }
-      },
+      } as JsonSchema,
       "nip-22": {
         type: "object",
         properties: {
@@ -339,7 +339,7 @@ export function App() {
             description: "Case-insensitive words to block in event content. Useful for basic spam/abuse prevention. Example words: 'spam', 'scam', 'viagra'. Use sparingly to avoid false positives."
           }
         }
-      },
+      } as JsonSchema,
       "rate-limit": {
         type: "object",
         properties: {
@@ -357,10 +357,10 @@ export function App() {
             description: "Maximum events a user can post per minute under normal conditions. Recommended: 60 for general use, 30 for conservative, 120 for high-activity communities. Higher values allow more activity but increase spam risk."
           }
         }
-      }
+      } as JsonSchema
     }
     
-    const demoConfig = {
+    const demoConfig: ConfigData = {
       relay: {
         name: "My Community Relay",
         description: "A welcoming community relay for thoughtful discussions and meaningful connections. We encourage respectful dialogue and support free expression within our community guidelines.",
